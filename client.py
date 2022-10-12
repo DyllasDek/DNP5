@@ -62,8 +62,8 @@ if __name__ == "__main__":
 
                 if line[0] == 'save':
                     text = line[1].split(' ', 1)
-                    key = mes[0][1:-1]
-                    msg = mes[1]
+                    key = text[0][1:-1]
+                    msg = text[1]
                     response = stub.Save(
                         pb2.SaveKey(key=key, text=msg))
 

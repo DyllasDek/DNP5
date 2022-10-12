@@ -15,7 +15,7 @@ def register(ipaddr, port):
         return -1, 'Chord is full'
     while True:
         node_id = random.randrange(max_size)
-        if new_id not in chord:
+        if node_id not in chord:
             break
     chord[node_id] = f'{ipaddr}:{port}'
     return node_id, m
