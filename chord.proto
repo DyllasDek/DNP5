@@ -7,6 +7,7 @@ service SimpleService {
     rpc Remove(RemFiKey) returns (SRFReply);
     rpc Find(RemFiKey) returns (SRFReply);
     rpc GetType(GetInfo) returns (TypeReply);
+    rpc RegisterNode(NodeInit) returns (NodeReply);
 }
 
 // Commands from client
@@ -51,4 +52,31 @@ message SRFReply {
 
 message TypeReply {
     string type = 1;
+}
+
+// Node initialasition
+
+message NodeInit {
+    string ipaddr = 1;
+    string port = 2;
+}
+
+message NodeReply {
+    int32 id = 1;
+    int32 m = 2;
+}
+
+//Deregister and populate
+message Nodeid {
+    int32 id = 1;
+}
+
+message DeregReply {
+    bool ack = 1;
+    string output = 2;
+}
+
+message TableReply {
+    int32 pred = 1;
+    repeated string table = 2;
 }
