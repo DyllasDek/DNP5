@@ -3,8 +3,9 @@ import grpc
 import random
 import chord_pb2_grpc as pb2_grpc
 import chord_pb2 as pb2
+from concurrent import futures
 
-address, m = sys.argv[1], sys.argv[2]
+server_port, m = sys.argv[1], int(sys.argv[2])
 max_size = 2 ** m
 chord = {}
 
@@ -50,6 +51,9 @@ def populate_finger_table(node_id):
 
 
 class Handler(pb2_grpc.SimpleServiceServicer):
+    def RegisterNode(self, request, context):
+        output=register(request.ipaddr, request.port)
+        return pb2.NodeReply(id=output[0],m=output[1])
     def GetReverseResponse(self, request, context):
         return pb2.ReverseResponse(message='%s' % request.input[::-1])
 
@@ -70,11 +74,12 @@ class Handler(pb2_grpc.SimpleServiceServicer):
             else:
                 yield pb2.PrimeResponse(output='%s is not prime ' % request.num)
 
-
+    def DeregisterNode(self, request, context):
+        return super().DeregisterNode(request, context)
 if __name__ == "__main__":
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     pb2_grpc.add_SimpleServiceServicer_to_server(Handler(), server)
-    server.add_insecure_port("localhost:"+port)
+    server.add_insecure_port(f"localhost:{server_port}")
     server.start()
     try:
         server.wait_for_termination()

@@ -44,6 +44,16 @@ class SimpleServiceStub(object):
                 request_serializer=chord__pb2.GetInfo.SerializeToString,
                 response_deserializer=chord__pb2.TypeReply.FromString,
                 )
+        self.RegisterNode = channel.unary_unary(
+                '/SimpleService/RegisterNode',
+                request_serializer=chord__pb2.NodeInit.SerializeToString,
+                response_deserializer=chord__pb2.NodeReply.FromString,
+                )
+        self.DeregisterNode = channel.unary_unary(
+                '/SimpleService/DeregisterNode',
+                request_serializer=chord__pb2.NodeId.SerializeToString,
+                response_deserializer=chord__pb2.DeregReply.FromString,
+                )
 
 
 class SimpleServiceServicer(object):
@@ -85,6 +95,18 @@ class SimpleServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def RegisterNode(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def DeregisterNode(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_SimpleServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -117,6 +139,16 @@ def add_SimpleServiceServicer_to_server(servicer, server):
                     servicer.GetType,
                     request_deserializer=chord__pb2.GetInfo.FromString,
                     response_serializer=chord__pb2.TypeReply.SerializeToString,
+            ),
+            'RegisterNode': grpc.unary_unary_rpc_method_handler(
+                    servicer.RegisterNode,
+                    request_deserializer=chord__pb2.NodeInit.FromString,
+                    response_serializer=chord__pb2.NodeReply.SerializeToString,
+            ),
+            'DeregisterNode': grpc.unary_unary_rpc_method_handler(
+                    servicer.DeregisterNode,
+                    request_deserializer=chord__pb2.NodeId.FromString,
+                    response_serializer=chord__pb2.DeregReply.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -227,5 +259,39 @@ class SimpleService(object):
         return grpc.experimental.unary_unary(request, target, '/SimpleService/GetType',
             chord__pb2.GetInfo.SerializeToString,
             chord__pb2.TypeReply.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def RegisterNode(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/SimpleService/RegisterNode',
+            chord__pb2.NodeInit.SerializeToString,
+            chord__pb2.NodeReply.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def DeregisterNode(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/SimpleService/DeregisterNode',
+            chord__pb2.NodeId.SerializeToString,
+            chord__pb2.DeregReply.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
