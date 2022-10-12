@@ -54,6 +54,11 @@ class SimpleServiceStub(object):
                 request_serializer=chord__pb2.NodeId.SerializeToString,
                 response_deserializer=chord__pb2.DeregReply.FromString,
                 )
+        self.GetFingerTable = channel.unary_unary(
+                '/SimpleService/GetFingerTable',
+                request_serializer=chord__pb2.NodeId.SerializeToString,
+                response_deserializer=chord__pb2.FingerTable.FromString,
+                )
 
 
 class SimpleServiceServicer(object):
@@ -107,6 +112,12 @@ class SimpleServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def GetFingerTable(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_SimpleServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -149,6 +160,11 @@ def add_SimpleServiceServicer_to_server(servicer, server):
                     servicer.DeregisterNode,
                     request_deserializer=chord__pb2.NodeId.FromString,
                     response_serializer=chord__pb2.DeregReply.SerializeToString,
+            ),
+            'GetFingerTable': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetFingerTable,
+                    request_deserializer=chord__pb2.NodeId.FromString,
+                    response_serializer=chord__pb2.FingerTable.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -293,5 +309,22 @@ class SimpleService(object):
         return grpc.experimental.unary_unary(request, target, '/SimpleService/DeregisterNode',
             chord__pb2.NodeId.SerializeToString,
             chord__pb2.DeregReply.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def GetFingerTable(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/SimpleService/GetFingerTable',
+            chord__pb2.NodeId.SerializeToString,
+            chord__pb2.FingerTable.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

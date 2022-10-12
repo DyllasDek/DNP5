@@ -13,7 +13,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0b\x63hord.proto\"\t\n\x07GetInfo\"$\n\x07SaveKey\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\x0c\n\x04text\x18\x02 \x01(\t\"\x17\n\x08RemFiKey\x12\x0b\n\x03key\x18\x01 \x01(\t\".\n\x11GetNodeChordReply\x12\n\n\x02id\x18\x01 \x01(\x05\x12\r\n\x05table\x18\x02 \x03(\t\"\x19\n\x08SRFReply\x12\r\n\x05reply\x18\x01 \x01(\t\"\x19\n\tTypeReply\x12\x0c\n\x04type\x18\x01 \x01(\t\"(\n\x08NodeInit\x12\x0e\n\x06ipaddr\x18\x01 \x01(\t\x12\x0c\n\x04port\x18\x02 \x01(\t\"\"\n\tNodeReply\x12\n\n\x02id\x18\x01 \x01(\x05\x12\t\n\x01m\x18\x02 \x01(\x05\"\x14\n\x06NodeId\x12\n\n\x02id\x18\x01 \x01(\x05\")\n\nDeregReply\x12\x0b\n\x03\x61\x63k\x18\x01 \x01(\x08\x12\x0e\n\x06output\x18\x02 \x01(\t\")\n\nTableReply\x12\x0c\n\x04pred\x18\x01 \x01(\x05\x12\r\n\x05table\x18\x02 \x03(\t2\xaf\x02\n\rSimpleService\x12*\n\x08GetChord\x12\x08.GetInfo\x1a\x12.GetNodeChordReply0\x01\x12\'\n\x07GetNode\x12\x08.GetInfo\x1a\x12.GetNodeChordReply\x12\x1b\n\x04Save\x12\x08.SaveKey\x1a\t.SRFReply\x12\x1e\n\x06Remove\x12\t.RemFiKey\x1a\t.SRFReply\x12\x1c\n\x04\x46ind\x12\t.RemFiKey\x1a\t.SRFReply\x12\x1f\n\x07GetType\x12\x08.GetInfo\x1a\n.TypeReply\x12%\n\x0cRegisterNode\x12\t.NodeInit\x1a\n.NodeReply\x12&\n\x0e\x44\x65registerNode\x12\x07.NodeId\x1a\x0b.DeregReplyb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0b\x63hord.proto\"\t\n\x07GetInfo\"$\n\x07SaveKey\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\x0c\n\x04text\x18\x02 \x01(\t\"\x17\n\x08RemFiKey\x12\x0b\n\x03key\x18\x01 \x01(\t\".\n\x11GetNodeChordReply\x12\n\n\x02id\x18\x01 \x01(\x05\x12\r\n\x05table\x18\x02 \x03(\t\"\x19\n\x08SRFReply\x12\r\n\x05reply\x18\x01 \x01(\t\"\x19\n\tTypeReply\x12\x0c\n\x04type\x18\x01 \x01(\t\"(\n\x08NodeInit\x12\x0e\n\x06ipaddr\x18\x01 \x01(\t\x12\x0c\n\x04port\x18\x02 \x01(\t\"\"\n\tNodeReply\x12\n\n\x02id\x18\x01 \x01(\x05\x12\t\n\x01m\x18\x02 \x01(\x05\"\x14\n\x06NodeId\x12\n\n\x02id\x18\x01 \x01(\x05\")\n\nDeregReply\x12\x0b\n\x03\x61\x63k\x18\x01 \x01(\x08\x12\x0e\n\x06output\x18\x02 \x01(\t\")\n\nTableReply\x12\x0c\n\x04pred\x18\x01 \x01(\x05\x12\r\n\x05table\x18\x02 \x03(\t\"d\n\x0b\x46ingerTable\x12\n\n\x02id\x18\x01 \x03(\x05\x12 \n\x05pairs\x18\x02 \x03(\x0b\x32\x11.FingerTable.Pair\x1a\'\n\x04Pair\x12\x0e\n\x06nodeId\x18\x01 \x01(\t\x12\x0f\n\x07\x61\x64\x64ress\x18\x02 \x01(\t2\xd8\x02\n\rSimpleService\x12*\n\x08GetChord\x12\x08.GetInfo\x1a\x12.GetNodeChordReply0\x01\x12\'\n\x07GetNode\x12\x08.GetInfo\x1a\x12.GetNodeChordReply\x12\x1b\n\x04Save\x12\x08.SaveKey\x1a\t.SRFReply\x12\x1e\n\x06Remove\x12\t.RemFiKey\x1a\t.SRFReply\x12\x1c\n\x04\x46ind\x12\t.RemFiKey\x1a\t.SRFReply\x12\x1f\n\x07GetType\x12\x08.GetInfo\x1a\n.TypeReply\x12%\n\x0cRegisterNode\x12\t.NodeInit\x1a\n.NodeReply\x12&\n\x0e\x44\x65registerNode\x12\x07.NodeId\x1a\x0b.DeregReply\x12\'\n\x0eGetFingerTable\x12\x07.NodeId\x1a\x0c.FingerTableb\x06proto3')
 
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, globals())
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'chord_pb2', globals())
@@ -42,6 +42,10 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _DEREGREPLY._serialized_end=332
   _TABLEREPLY._serialized_start=334
   _TABLEREPLY._serialized_end=375
-  _SIMPLESERVICE._serialized_start=378
-  _SIMPLESERVICE._serialized_end=681
+  _FINGERTABLE._serialized_start=377
+  _FINGERTABLE._serialized_end=477
+  _FINGERTABLE_PAIR._serialized_start=438
+  _FINGERTABLE_PAIR._serialized_end=477
+  _SIMPLESERVICE._serialized_start=480
+  _SIMPLESERVICE._serialized_end=824
 # @@protoc_insertion_point(module_scope)

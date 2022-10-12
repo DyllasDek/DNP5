@@ -76,6 +76,8 @@ class Handler(pb2_grpc.SimpleServiceServicer):
 
     def DeregisterNode(self, request, context):
         return super().DeregisterNode(request, context)
+
+        
 if __name__ == "__main__":
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     pb2_grpc.add_SimpleServiceServicer_to_server(Handler(), server)
