@@ -17,27 +17,32 @@ class SimpleServiceStub(object):
         self.GetChord = channel.unary_stream(
                 '/SimpleService/GetChord',
                 request_serializer=chord__pb2.GetInfo.SerializeToString,
-                response_deserializer=chord__pb2.GetChordReply.FromString,
+                response_deserializer=chord__pb2.GetNodeChordReply.FromString,
                 )
         self.GetNode = channel.unary_unary(
                 '/SimpleService/GetNode',
                 request_serializer=chord__pb2.GetInfo.SerializeToString,
-                response_deserializer=chord__pb2.GetNodeReply.FromString,
+                response_deserializer=chord__pb2.GetNodeChordReply.FromString,
                 )
         self.Save = channel.unary_unary(
                 '/SimpleService/Save',
                 request_serializer=chord__pb2.SaveKey.SerializeToString,
-                response_deserializer=chord__pb2.SaveReply.FromString,
+                response_deserializer=chord__pb2.SRFReply.FromString,
                 )
         self.Remove = channel.unary_unary(
                 '/SimpleService/Remove',
                 request_serializer=chord__pb2.RemFiKey.SerializeToString,
-                response_deserializer=chord__pb2.RemoveReply.FromString,
+                response_deserializer=chord__pb2.SRFReply.FromString,
                 )
         self.Find = channel.unary_unary(
                 '/SimpleService/Find',
                 request_serializer=chord__pb2.RemFiKey.SerializeToString,
-                response_deserializer=chord__pb2.FindReply.FromString,
+                response_deserializer=chord__pb2.SRFReply.FromString,
+                )
+        self.GetType = channel.unary_unary(
+                '/SimpleService/GetType',
+                request_serializer=chord__pb2.GetInfo.SerializeToString,
+                response_deserializer=chord__pb2.TypeReply.FromString,
                 )
 
 
@@ -74,33 +79,44 @@ class SimpleServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def GetType(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_SimpleServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'GetChord': grpc.unary_stream_rpc_method_handler(
                     servicer.GetChord,
                     request_deserializer=chord__pb2.GetInfo.FromString,
-                    response_serializer=chord__pb2.GetChordReply.SerializeToString,
+                    response_serializer=chord__pb2.GetNodeChordReply.SerializeToString,
             ),
             'GetNode': grpc.unary_unary_rpc_method_handler(
                     servicer.GetNode,
                     request_deserializer=chord__pb2.GetInfo.FromString,
-                    response_serializer=chord__pb2.GetNodeReply.SerializeToString,
+                    response_serializer=chord__pb2.GetNodeChordReply.SerializeToString,
             ),
             'Save': grpc.unary_unary_rpc_method_handler(
                     servicer.Save,
                     request_deserializer=chord__pb2.SaveKey.FromString,
-                    response_serializer=chord__pb2.SaveReply.SerializeToString,
+                    response_serializer=chord__pb2.SRFReply.SerializeToString,
             ),
             'Remove': grpc.unary_unary_rpc_method_handler(
                     servicer.Remove,
                     request_deserializer=chord__pb2.RemFiKey.FromString,
-                    response_serializer=chord__pb2.RemoveReply.SerializeToString,
+                    response_serializer=chord__pb2.SRFReply.SerializeToString,
             ),
             'Find': grpc.unary_unary_rpc_method_handler(
                     servicer.Find,
                     request_deserializer=chord__pb2.RemFiKey.FromString,
-                    response_serializer=chord__pb2.FindReply.SerializeToString,
+                    response_serializer=chord__pb2.SRFReply.SerializeToString,
+            ),
+            'GetType': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetType,
+                    request_deserializer=chord__pb2.GetInfo.FromString,
+                    response_serializer=chord__pb2.TypeReply.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -125,7 +141,7 @@ class SimpleService(object):
             metadata=None):
         return grpc.experimental.unary_stream(request, target, '/SimpleService/GetChord',
             chord__pb2.GetInfo.SerializeToString,
-            chord__pb2.GetChordReply.FromString,
+            chord__pb2.GetNodeChordReply.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -142,7 +158,7 @@ class SimpleService(object):
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/SimpleService/GetNode',
             chord__pb2.GetInfo.SerializeToString,
-            chord__pb2.GetNodeReply.FromString,
+            chord__pb2.GetNodeChordReply.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -159,7 +175,7 @@ class SimpleService(object):
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/SimpleService/Save',
             chord__pb2.SaveKey.SerializeToString,
-            chord__pb2.SaveReply.FromString,
+            chord__pb2.SRFReply.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -176,7 +192,7 @@ class SimpleService(object):
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/SimpleService/Remove',
             chord__pb2.RemFiKey.SerializeToString,
-            chord__pb2.RemoveReply.FromString,
+            chord__pb2.SRFReply.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -193,6 +209,23 @@ class SimpleService(object):
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/SimpleService/Find',
             chord__pb2.RemFiKey.SerializeToString,
-            chord__pb2.FindReply.FromString,
+            chord__pb2.SRFReply.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def GetType(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/SimpleService/GetType',
+            chord__pb2.GetInfo.SerializeToString,
+            chord__pb2.TypeReply.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

@@ -13,7 +13,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0b\x63hord.proto\"\t\n\x07GetInfo\"$\n\x07SaveKey\x12\x0b\n\x03key\x18\x01 \x01(\x05\x12\x0c\n\x04text\x18\x02 \x01(\t\"\x17\n\x08RemFiKey\x12\x0b\n\x03key\x18\x01 \x01(\t\")\n\rGetChordReply\x12\n\n\x02id\x18\x01 \x01(\x05\x12\x0c\n\x04\x61\x64\x64r\x18\x02 \x01(\t\"\x1d\n\x0cGetNodeReply\x12\r\n\x05table\x18\x01 \x03(\x05\"&\n\tSaveReply\x12\r\n\x05saved\x18\x01 \x01(\x08\x12\n\n\x02id\x18\x02 \x01(\x05\"*\n\x0bRemoveReply\x12\x0f\n\x07removed\x18\x01 \x01(\x08\x12\n\n\x02id\x18\x02 \x01(\x05\"&\n\tFindReply\x12\r\n\x05\x66ound\x18\x01 \x01(\x08\x12\n\n\x02id\x18\x02 \x01(\x05\x32\xbb\x01\n\rSimpleService\x12&\n\x08GetChord\x12\x08.GetInfo\x1a\x0e.GetChordReply0\x01\x12\"\n\x07GetNode\x12\x08.GetInfo\x1a\r.GetNodeReply\x12\x1c\n\x04Save\x12\x08.SaveKey\x1a\n.SaveReply\x12!\n\x06Remove\x12\t.RemFiKey\x1a\x0c.RemoveReply\x12\x1d\n\x04\x46ind\x12\t.RemFiKey\x1a\n.FindReplyb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0b\x63hord.proto\"\t\n\x07GetInfo\"$\n\x07SaveKey\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\x0c\n\x04text\x18\x02 \x01(\t\"\x17\n\x08RemFiKey\x12\x0b\n\x03key\x18\x01 \x01(\t\".\n\x11GetNodeChordReply\x12\n\n\x02id\x18\x01 \x01(\x05\x12\r\n\x05table\x18\x02 \x03(\t\"\x19\n\x08SRFReply\x12\r\n\x05reply\x18\x01 \x01(\t\"\x19\n\tTypeReply\x12\x0c\n\x04type\x18\x01 \x01(\t2\xe0\x01\n\rSimpleService\x12*\n\x08GetChord\x12\x08.GetInfo\x1a\x12.GetNodeChordReply0\x01\x12\'\n\x07GetNode\x12\x08.GetInfo\x1a\x12.GetNodeChordReply\x12\x1b\n\x04Save\x12\x08.SaveKey\x1a\t.SRFReply\x12\x1e\n\x06Remove\x12\t.RemFiKey\x1a\t.SRFReply\x12\x1c\n\x04\x46ind\x12\t.RemFiKey\x1a\t.SRFReply\x12\x1f\n\x07GetType\x12\x08.GetInfo\x1a\n.TypeReplyb\x06proto3')
 
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, globals())
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'chord_pb2', globals())
@@ -26,16 +26,12 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _SAVEKEY._serialized_end=62
   _REMFIKEY._serialized_start=64
   _REMFIKEY._serialized_end=87
-  _GETCHORDREPLY._serialized_start=89
-  _GETCHORDREPLY._serialized_end=130
-  _GETNODEREPLY._serialized_start=132
-  _GETNODEREPLY._serialized_end=161
-  _SAVEREPLY._serialized_start=163
-  _SAVEREPLY._serialized_end=201
-  _REMOVEREPLY._serialized_start=203
-  _REMOVEREPLY._serialized_end=245
-  _FINDREPLY._serialized_start=247
-  _FINDREPLY._serialized_end=285
-  _SIMPLESERVICE._serialized_start=288
-  _SIMPLESERVICE._serialized_end=475
+  _GETNODECHORDREPLY._serialized_start=89
+  _GETNODECHORDREPLY._serialized_end=135
+  _SRFREPLY._serialized_start=137
+  _SRFREPLY._serialized_end=162
+  _TYPEREPLY._serialized_start=164
+  _TYPEREPLY._serialized_end=189
+  _SIMPLESERVICE._serialized_start=192
+  _SIMPLESERVICE._serialized_end=416
 # @@protoc_insertion_point(module_scope)

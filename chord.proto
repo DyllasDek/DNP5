@@ -1,11 +1,12 @@
 syntax = "proto3";
 
 service SimpleService {
-    rpc GetChord(GetInfo) returns (stream GetChordReply);
-    rpc GetNode(GetInfo) returns (GetNodeReply);
-    rpc Save(SaveKey) returns (SaveReply);
-    rpc Remove(RemFiKey) returns (RemoveReply);
-    rpc Find(RemFiKey) returns (FindReply);
+    rpc GetChord(GetInfo) returns (stream GetNodeChordReply);
+    rpc GetNode(GetInfo) returns (GetNodeChordReply);
+    rpc Save(SaveKey) returns (SRFReply);
+    rpc Remove(RemFiKey) returns (SRFReply);
+    rpc Find(RemFiKey) returns (SRFReply);
+    rpc GetType(GetInfo) returns (TypeReply);
 }
 
 // Commands from client
@@ -23,7 +24,7 @@ text: some “text” here
 It tells the connected node to save the text with the given key. Prints the result.
 */
 message SaveKey {
-    int32 key = 1;
+    string key = 1;
     string text = 2;
 }
 
@@ -38,27 +39,16 @@ message RemFiKey {
 
 // Reply for client
 
-//Return list of tuples
-message GetChordReply {
+//Return list of tuples/finger table
+message GetNodeChordReply {
     int32 id = 1;
-    string addr = 2;
+    repeated string table = 2;
 }
-// Return finger table
-message GetNodeReply {
-    repeated int32 table = 1;
+
+message SRFReply {
+    string reply =1;
 }
-// True if saved, false otherwise
-message SaveReply {
-    bool saved = 1;
-    int32 id = 2;
-}
-// True if removed, false otherwise
-message RemoveReply {
-    bool removed = 1;
-    int32 id = 2;
-}
-// True
-message FindReply {
-    bool found = 1;
-    int32 id = 2;
+
+message TypeReply {
+    string type = 1;
 }
