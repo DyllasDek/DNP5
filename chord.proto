@@ -9,6 +9,8 @@ service SimpleService {
     rpc GetType(GetInfo) returns (TypeReply);
     rpc RegisterNode(NodeInit) returns (NodeReply);
     rpc DeregisterNode(NodeId) returns (DeregReply);
+    rpc GetFingerTable(NodeId) returns (FingerTable);
+}
 }
 
 // Commands from client
@@ -79,5 +81,13 @@ message TableReply {
     repeated string table = 2;
 }
 
+message FingerTable {
+  message Pair {
+    string nodeId = 1;
+    string address = 2;
+  }
+  repeated int id = 1;
+  repeated Pair pairs = 2;
+}
 //Deregister and populate
 // Node initialasition
