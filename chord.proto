@@ -10,6 +10,7 @@ service SimpleService {
     rpc RegisterNode(NodeInit) returns (NodeReply);
     rpc DeregisterNode(NodeId) returns (DeregReply);
     rpc GetFingerTable(NodeId) returns (FingerTable);
+    rpc ReloadTable(GetInfo) returns (GetInfo);
 }
 
 

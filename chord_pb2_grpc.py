@@ -59,6 +59,11 @@ class SimpleServiceStub(object):
                 request_serializer=chord__pb2.NodeId.SerializeToString,
                 response_deserializer=chord__pb2.FingerTable.FromString,
                 )
+        self.ReloadTable = channel.unary_unary(
+                '/SimpleService/ReloadTable',
+                request_serializer=chord__pb2.GetInfo.SerializeToString,
+                response_deserializer=chord__pb2.GetInfo.FromString,
+                )
 
 
 class SimpleServiceServicer(object):
@@ -118,6 +123,12 @@ class SimpleServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def ReloadTable(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_SimpleServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -165,6 +176,11 @@ def add_SimpleServiceServicer_to_server(servicer, server):
                     servicer.GetFingerTable,
                     request_deserializer=chord__pb2.NodeId.FromString,
                     response_serializer=chord__pb2.FingerTable.SerializeToString,
+            ),
+            'ReloadTable': grpc.unary_unary_rpc_method_handler(
+                    servicer.ReloadTable,
+                    request_deserializer=chord__pb2.GetInfo.FromString,
+                    response_serializer=chord__pb2.GetInfo.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -326,5 +342,22 @@ class SimpleService(object):
         return grpc.experimental.unary_unary(request, target, '/SimpleService/GetFingerTable',
             chord__pb2.NodeId.SerializeToString,
             chord__pb2.FingerTable.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def ReloadTable(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/SimpleService/ReloadTable',
+            chord__pb2.GetInfo.SerializeToString,
+            chord__pb2.GetInfo.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
