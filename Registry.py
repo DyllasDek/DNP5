@@ -5,11 +5,15 @@ import chord_pb2_grpc as pb2_grpc
 import chord_pb2 as pb2
 from concurrent import futures
 
-server_port, m = sys.argv[1], int(sys.argv[2])
+server_address, m = sys.argv[1], int(sys.argv[2])
 max_size = 2 ** m
 chord = {}
-
-
+def parse_address(address):
+    split_res=address.split(":")
+    if len(split_res) == 1: #we pass value only of the port
+        return f"localhost:{address}"
+    return address
+        
 def register(ipaddr, port):
     random.seed(0)
     if len(chord) == max_size:
@@ -81,7 +85,7 @@ class Handler(pb2_grpc.SimpleServiceServicer):
 if __name__ == "__main__":
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     pb2_grpc.add_SimpleServiceServicer_to_server(Handler(), server)
-    server.add_insecure_port(f"localhost:{server_port}")
+    server.add_insecure_port(parse_address(server_address))
     server.start()
     try:
         server.wait_for_termination()
