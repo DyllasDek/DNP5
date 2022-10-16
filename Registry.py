@@ -1,4 +1,5 @@
 import sys
+from Node import get_successor_id
 import grpc
 import random
 import chord_pb2_grpc as pb2_grpc
@@ -46,16 +47,14 @@ def get_chord_info():
 
 def findSucc(entry):
     for id in sorted(chord.keys()):
-        if entry < id:
+        if entry <= id:
             return id
-    return entry
 
 
 def findPred(entry):
     for id in reversed(sorted(chord.keys())):
-        if entry > id:
+        if entry >= id:
             return id
-    return entry
 
 
 def populate_finger_table(node_id):
@@ -77,9 +76,6 @@ class Handler(pb2_grpc.SimpleServiceServicer):
     def GetFingerTable(self, request, context):
         table = populate_finger_table(request.id)
         out_pred = findPred(request.id)
-        print(out_pred)
-        print("lox")
-        print(type(out_pred))
         msg = pb2.FingerTable()
         msg.id.nodeId = out_pred
         msg.id.address = chord[out_pred]
@@ -90,10 +86,11 @@ class Handler(pb2_grpc.SimpleServiceServicer):
             pair.nodeId = key
             pair.address = table[key]
 
-        print(msg)
         return msg
-        # return pb2.FingerTable(id=pb2.NodePair(nodeId=out_pred, address=chord[out_pred]), pairs[:]=out_table)
-
+    def GetSuccessor(self, request, context):
+        succ_id= get_successor_id(request.id)
+        succ_address=chord[succ_id]
+        return pb2.NodePair(nodeId=succ_id,address=succ_address) 
     def GetSplitResponse(self, request, context):
 
         m_string = request.input.split(request.delim)

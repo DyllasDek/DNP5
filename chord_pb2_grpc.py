@@ -59,6 +59,11 @@ class SimpleServiceStub(object):
                 request_serializer=chord__pb2.NodeId.SerializeToString,
                 response_deserializer=chord__pb2.FingerTable.FromString,
                 )
+        self.GetSuccessor = channel.unary_unary(
+                '/SimpleService/GetSuccessor',
+                request_serializer=chord__pb2.NodeId.SerializeToString,
+                response_deserializer=chord__pb2.NodePair.FromString,
+                )
         self.ReloadTable = channel.unary_unary(
                 '/SimpleService/ReloadTable',
                 request_serializer=chord__pb2.GetInfo.SerializeToString,
@@ -123,6 +128,12 @@ class SimpleServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def GetSuccessor(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
     def ReloadTable(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
@@ -176,6 +187,11 @@ def add_SimpleServiceServicer_to_server(servicer, server):
                     servicer.GetFingerTable,
                     request_deserializer=chord__pb2.NodeId.FromString,
                     response_serializer=chord__pb2.FingerTable.SerializeToString,
+            ),
+            'GetSuccessor': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetSuccessor,
+                    request_deserializer=chord__pb2.NodeId.FromString,
+                    response_serializer=chord__pb2.NodePair.SerializeToString,
             ),
             'ReloadTable': grpc.unary_unary_rpc_method_handler(
                     servicer.ReloadTable,
@@ -342,6 +358,23 @@ class SimpleService(object):
         return grpc.experimental.unary_unary(request, target, '/SimpleService/GetFingerTable',
             chord__pb2.NodeId.SerializeToString,
             chord__pb2.FingerTable.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def GetSuccessor(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/SimpleService/GetSuccessor',
+            chord__pb2.NodeId.SerializeToString,
+            chord__pb2.NodePair.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 

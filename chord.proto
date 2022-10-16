@@ -10,8 +10,10 @@ service SimpleService {
     rpc RegisterNode(NodeInit) returns (NodeReply);
     rpc DeregisterNode(NodeId) returns (DeregReply);
     rpc GetFingerTable(NodeId) returns (FingerTable);
+    rpc GetSuccessor(NodeId) returns (NodePair);
     rpc ReloadTable(GetInfo) returns (GetInfo);
 }
+
 
 
 // Commands from client
@@ -52,6 +54,7 @@ message GetNodeChordReply {
 
 message SRFReply {
     string reply =1;
+    bool success=2;
 }
 
 message TypeReply {
