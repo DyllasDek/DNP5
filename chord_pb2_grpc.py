@@ -39,11 +39,6 @@ class SimpleServiceStub(object):
                 request_serializer=chord__pb2.RemFiKey.SerializeToString,
                 response_deserializer=chord__pb2.SRFReply.FromString,
                 )
-        self.FindKey = channel.unary_unary(
-                '/SimpleService/FindKey',
-                request_serializer=chord__pb2.RemFiKey.SerializeToString,
-                response_deserializer=chord__pb2.SRFReply.FromString,
-                )
         self.GetType = channel.unary_unary(
                 '/SimpleService/GetType',
                 request_serializer=chord__pb2.GetInfo.SerializeToString,
@@ -79,6 +74,21 @@ class SimpleServiceStub(object):
                 request_serializer=chord__pb2.GetInfo.SerializeToString,
                 response_deserializer=chord__pb2.KeysTextReply.FromString,
                 )
+        self.SaveFromClient = channel.unary_unary(
+                '/SimpleService/SaveFromClient',
+                request_serializer=chord__pb2.SaveKey.SerializeToString,
+                response_deserializer=chord__pb2.SRFReply.FromString,
+                )
+        self.RemoveFromClient = channel.unary_unary(
+                '/SimpleService/RemoveFromClient',
+                request_serializer=chord__pb2.RemFiKey.SerializeToString,
+                response_deserializer=chord__pb2.SRFReply.FromString,
+                )
+        self.FindKey = channel.unary_unary(
+                '/SimpleService/FindKey',
+                request_serializer=chord__pb2.RemFiKey.SerializeToString,
+                response_deserializer=chord__pb2.SRFReply.FromString,
+                )
 
 
 class SimpleServiceServicer(object):
@@ -109,12 +119,6 @@ class SimpleServiceServicer(object):
         raise NotImplementedError('Method not implemented!')
 
     def Find(self, request, context):
-        """Missing associated documentation comment in .proto file."""
-        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details('Method not implemented!')
-        raise NotImplementedError('Method not implemented!')
-
-    def FindKey(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -162,6 +166,24 @@ class SimpleServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def SaveFromClient(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def RemoveFromClient(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def FindKey(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_SimpleServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -187,11 +209,6 @@ def add_SimpleServiceServicer_to_server(servicer, server):
             ),
             'Find': grpc.unary_unary_rpc_method_handler(
                     servicer.Find,
-                    request_deserializer=chord__pb2.RemFiKey.FromString,
-                    response_serializer=chord__pb2.SRFReply.SerializeToString,
-            ),
-            'FindKey': grpc.unary_unary_rpc_method_handler(
-                    servicer.FindKey,
                     request_deserializer=chord__pb2.RemFiKey.FromString,
                     response_serializer=chord__pb2.SRFReply.SerializeToString,
             ),
@@ -229,6 +246,21 @@ def add_SimpleServiceServicer_to_server(servicer, server):
                     servicer.GetKeysText,
                     request_deserializer=chord__pb2.GetInfo.FromString,
                     response_serializer=chord__pb2.KeysTextReply.SerializeToString,
+            ),
+            'SaveFromClient': grpc.unary_unary_rpc_method_handler(
+                    servicer.SaveFromClient,
+                    request_deserializer=chord__pb2.SaveKey.FromString,
+                    response_serializer=chord__pb2.SRFReply.SerializeToString,
+            ),
+            'RemoveFromClient': grpc.unary_unary_rpc_method_handler(
+                    servicer.RemoveFromClient,
+                    request_deserializer=chord__pb2.RemFiKey.FromString,
+                    response_serializer=chord__pb2.SRFReply.SerializeToString,
+            ),
+            'FindKey': grpc.unary_unary_rpc_method_handler(
+                    servicer.FindKey,
+                    request_deserializer=chord__pb2.RemFiKey.FromString,
+                    response_serializer=chord__pb2.SRFReply.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -320,23 +352,6 @@ class SimpleService(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/SimpleService/Find',
-            chord__pb2.RemFiKey.SerializeToString,
-            chord__pb2.SRFReply.FromString,
-            options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
-
-    @staticmethod
-    def FindKey(request,
-            target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/SimpleService/FindKey',
             chord__pb2.RemFiKey.SerializeToString,
             chord__pb2.SRFReply.FromString,
             options, channel_credentials,
@@ -458,5 +473,56 @@ class SimpleService(object):
         return grpc.experimental.unary_unary(request, target, '/SimpleService/GetKeysText',
             chord__pb2.GetInfo.SerializeToString,
             chord__pb2.KeysTextReply.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def SaveFromClient(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/SimpleService/SaveFromClient',
+            chord__pb2.SaveKey.SerializeToString,
+            chord__pb2.SRFReply.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def RemoveFromClient(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/SimpleService/RemoveFromClient',
+            chord__pb2.RemFiKey.SerializeToString,
+            chord__pb2.SRFReply.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def FindKey(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/SimpleService/FindKey',
+            chord__pb2.RemFiKey.SerializeToString,
+            chord__pb2.SRFReply.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

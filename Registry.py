@@ -25,11 +25,13 @@ def register(ipaddr, port):
         node_id = random.randrange(max_size)
         if node_id not in chord:
             break
-    for keys in chord:
-        ch = grpc.insecure_channel(chord[keys])
-        f_stub = pb2_grpc.SimpleServiceStub(ch)
-        f_stub.ReloadTable(pb2.GetInfo())
     chord[node_id] = f'{ipaddr}:{port}'
+    for keys in chord:
+        if node_id != keys:
+            ch = grpc.insecure_channel(chord[keys])
+            f_stub = pb2_grpc.SimpleServiceStub(ch)
+            print("lox obnov")
+            f_stub.ReloadTable(pb2.GetInfo())
     return node_id, m
 
 
@@ -62,14 +64,25 @@ def findPred(entry):
     return entry
 
 
+def find(entry):
+    successor = entry
+    for i in range(0, max_size):
+        if (successor + i) % max_size in chord.keys():
+            successor = (successor + i) % max_size
+            break
+    return successor
+
+
 def populate_finger_table(node_id):
     finger_table = {}
     for i in range(1, m+1):
         try:
-            node = findSucc((node_id+2**(i-1)) % max_size)
+            node = find((node_id+2**(i-1)) % max_size)
             finger_table[node] = chord[node]
         except:
+            print(f'gavno {node}')
             continue
+    print()
     return finger_table
 
 
@@ -79,6 +92,11 @@ class Handler(pb2_grpc.SimpleServiceServicer):
 
     def RegisterNode(self, request, context):
         output = register(request.ipaddr, request.port)
+        for keys in chord:
+            if keys != output[0]:
+                ch = grpc.insecure_channel(chord[keys])
+                f_stub = pb2_grpc.SimpleServiceStub(ch)
+                f_stub.ReloadTable(pb2.GetInfo())
         return pb2.NodeReply(id=output[0], m=output[1])
 
     def GetReverseResponse(self, request, context):
@@ -86,7 +104,6 @@ class Handler(pb2_grpc.SimpleServiceServicer):
 
     def GetFingerTable(self, request, context):
         table = populate_finger_table(request.id)
-        print(table)
         out_pred = findPred(request.id)
         msg = []
         for keys in table:
@@ -103,7 +120,6 @@ class Handler(pb2_grpc.SimpleServiceServicer):
         msg = []
         for key in chord:
             msg.append(f'{key}:   {chord[key]}')
-        print(msg)
         return pb2.GetNodeChordReply(id=-1, table=msg)
 
     def DeregisterNode(self, request, context):
@@ -113,6 +129,7 @@ class Handler(pb2_grpc.SimpleServiceServicer):
                 ch = grpc.insecure_channel(chord[keys])
                 f_stub = pb2_grpc.SimpleServiceStub(ch)
                 f_stub.ReloadTable(pb2.GetInfo())
+            return pb2.DeregReply(ack=True, output="Done!")
         except:
             return pb2.DeregReply(ack=False, output="Already deleted")
 

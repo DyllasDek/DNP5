@@ -6,7 +6,7 @@ service SimpleService {
     rpc Save(SaveKey) returns (SRFReply);
     rpc Remove(RemFiKey) returns (SRFReply);
     rpc Find(RemFiKey) returns (SRFReply);
-    rpc FindKey(RemFiKey) returns (SRFReply);
+    
     rpc GetType(GetInfo) returns (TypeReply);
     rpc RegisterNode(NodeInit) returns (NodeReply);
     rpc DeregisterNode(NodeId) returns (DeregReply);
@@ -14,6 +14,10 @@ service SimpleService {
     rpc GetSuccessor(NodeId) returns (NodePair);
     rpc ReloadTable(GetInfo) returns (GetInfo);
     rpc GetKeysText(GetInfo) returns (KeysTextReply);
+
+    rpc SaveFromClient(SaveKey) returns (SRFReply);
+    rpc RemoveFromClient(RemFiKey) returns (SRFReply); 
+    rpc FindKey(RemFiKey) returns (SRFReply);
 }
 
 

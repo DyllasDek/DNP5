@@ -13,7 +13,7 @@ reg_stub = pb2_grpc.SimpleServiceStub(channel)
 ip, port = listen_address.split(":")
 
 nodeid = -1
-max_size = -1
+m = -1
 predecessor = None
 data = {}
 finger_table = {}
@@ -21,40 +21,50 @@ finger_table = {}
 
 def hash(key):
     hash_value = zlib.adler32(key.encode())
-    target_id = hash_value % 2 ** max_size
+    target_id = hash_value % 2 ** m
     return target_id
 
 
 def find(key):
     id = hash(key)
+    print("let's look")
+    print(listen_address)
+    print(predecessor)
+    print('lox')
     if (predecessor[0] < id <= nodeid):
         return True, (nodeid, listen_address)
-    succ = reg_stub.GetSuccessor(nodeid)
+    succ = reg_stub.GetSuccessor(pb2.NodeId(id=nodeid))
+    print(f'successors {succ.nodeId}')
     if (nodeid < id <= succ.nodeId):
         return True, (succ.nodeId, succ.address)
+    print('fsdasdjkasdj')
     keys = sorted(list(finger_table))
     for i in range(len(keys)):
         if (keys[i] >= id):
             ch = grpc.insecure_channel(finger_table[keys[i-1]])
             f_stub = pb2_grpc.SimpleServiceStub(ch)
-            reply, _ = f_stub.Find(pb2.RemFiKey(key=key))
-            reply = reply.split("||", 1)
-            return True, (reply[0], reply[1])
+            print("try get reply")
+            reply = f_stub.Find(pb2.RemFiKey(key=key))
+            print("got reply")
+
+            if reply.success:
+                msg = reply.reply.split("||", 1)
+            else:
+                msg = '0'
+            print(f'found msg! {msg}')
+            return True, (msg[0], msg[1])
     return False, "No key result"
 
 
 def save(key, text):
     ack, result = find(key)
+    print(ack, result)
     if (ack):
         send_channel = grpc.insecure_channel(result[1])
         send_stub = pb2_grpc.SimpleServiceStub(send_channel)
         result = send_stub.Save(pb2.SaveKey(key=key, text=text))
-        if (result.success):
-            print(result.reply)
-            return (True, id)
-        else:
-            print(result.reply)
-            return (False, result.reply)
+
+        return (result.success, result.reply)
     else:
         return (False, result)
 
@@ -65,12 +75,7 @@ def remove(key):
         send_channel = grpc.insecure_channel(result[1])
         send_stub = pb2_grpc.SimpleServiceStub(send_channel)
         result = send_stub.Remove(pb2.RemFiKey(key=key))
-        if (result.success):
-            print(result.reply)
-            return (True, id)
-        else:
-            print(result.reply)
-            return (False, result.reply)
+        return (result.success, result.reply)
     else:
         return (False, result)
 
@@ -98,7 +103,7 @@ def start():
 
 
 def exit():
-    reply = reg_stub.DeregisterNode(pb2.NodeId(nodeid))
+    reply = reg_stub.DeregisterNode(pb2.NodeId(id=nodeid))
     return reply.ack, reply.output
 
 
@@ -106,10 +111,17 @@ def GetKeys():
     return data.keys()
 
 
+def Update():
+    global finger_table
+    global predecessor
+    finger_table, predecessor = get_finger_table()
+    print(finger_table)
+
+
 class Handler(pb2_grpc.SimpleServiceServicer):
 
     def ReloadTable(self, request, context):
-        finger_table, predecessor = get_finger_table()
+        Update()
         return pb2.GetInfo()
 
     def GetType(self, request, context):
@@ -131,17 +143,26 @@ class Handler(pb2_grpc.SimpleServiceServicer):
                 return pb2.SRFReply(reply=f"{request.key} is saved in {nodeid}", success=True)
         else:
             ch = grpc.insecure_channel(reply[1])
-            f_stub = pb2_grpc.SimpleServiceStub(channel)
-            keys = f_stub.GetKeysText(pb2.GetInfo())
-            if request.keys in keys:
+            f_stub = pb2_grpc.SimpleServiceStub(ch)
+            repl = f_stub.GetKeysText(pb2.GetInfo())
+            print(repl.keys)
+            if request.key in repl.keys:
                 return pb2.SRFReply(reply=f"{request.key} is saved in {reply[0]}", success=True)
         return pb2.SRFReply(reply=f'{request.key} does not exist in node {reply[0]}', success=False)
+
+    def SaveFromClient(self, request, context):
+        tup = save(request.key, request.text)
+        return pb2.SRFReply(reply=tup[1], success=tup[0])
+
+    def RemoveFromClient(self, request, context):
+        tup = remove(request.key)
+        return pb2.SRFReply(reply=tup[1], success=tup[0])
 
     def Save(self, request, context):
         if (request.key in data):
             return pb2.SRFReply(reply=f"{request.key} already exists in node {nodeid}", success=False)
         data[request.key] = request.text
-        return pb2.SRFReply(reply=f"{request.text} is saved in node {nodeid}", success=True)
+        return pb2.SRFReply(reply=f"{request.key} is saved in node {nodeid}", success=True)
 
     def Remove(self, request, context):
         if (request.key not in data):
@@ -164,19 +185,18 @@ class Handler(pb2_grpc.SimpleServiceServicer):
         return pb2.KeysTextReply(keys=msg)
 
 
-if __name__ == "__main__":
-    nodeid, max_size = start()
-    finger_table, predecessor = get_finger_table()
-    server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
-    pb2_grpc.add_SimpleServiceServicer_to_server(Handler(), server)
-    server.add_insecure_port(listen_address)
-    server.start()
-    try:
-        server.wait_for_termination()
-    except KeyboardInterrupt:
-        flag, msg = exit()
-        if flag:
-            print(f'Succesfully deregistred node with id {nodeid}')
-        else:
-            print(f"Unsuccesful deregister with error:{msg}")
-    print("Shutdowned")
+nodeid, m = start()
+finger_table, predecessor = get_finger_table()
+server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
+pb2_grpc.add_SimpleServiceServicer_to_server(Handler(), server)
+server.add_insecure_port(listen_address)
+server.start()
+try:
+    server.wait_for_termination()
+except KeyboardInterrupt:
+    flag, msg = exit()
+    if flag:
+        print(f'Succesfully deregistred node with id {nodeid}')
+    else:
+        print(f"Unsuccesful deregister with error:{msg}")
+print("Shutdowned")

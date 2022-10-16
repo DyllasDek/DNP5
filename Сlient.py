@@ -4,7 +4,8 @@ import chord_pb2_grpc as pb2_grpc
 import chord_pb2 as pb2
 
 channel = 0
-stub = 0
+server_type = 0
+stub = None
 
 
 def send_messages(val):
@@ -15,14 +16,16 @@ def send_messages(val):
 
 
 def connect(ip):
+    global channel
+    global stub
+    global server_type
     channel = grpc.insecure_channel(ip)
     stub = pb2_grpc.SimpleServiceStub(channel)
     server_type = stub.GetType(pb2.GetInfo())
-    return stub, server_type.type
+    return server_type.type
 
 
 def NodeInfo():
-    print("lox")
     resp = stub.GetNode(pb2.GetInfo())
     print(f'Node id: {resp.id}')
     print("Finger table:")
@@ -37,9 +40,7 @@ def ChordInfo():
 
 
 if __name__ == "__main__":
-    server_type = 0
 
-    stub = None
     while True:
         response = 0
         try:
@@ -48,8 +49,7 @@ if __name__ == "__main__":
                 line = line.split(' ', 1)
 
                 if line[0] == "connect":
-                    stub, server_type = connect(line[1])
-                    print()
+                    server_type = connect(line[1])
                     print(f'Connected to {server_type}')
                     continue
 
@@ -66,17 +66,20 @@ if __name__ == "__main__":
                     text = line[1].split(' ', 1)
                     key = text[0][1:-1]
                     msg = text[1]
-                    response = stub.Save(
+                    response = stub.SaveFromClient(
                         pb2.SaveKey(key=key, text=msg))
+                    print(f'{response.success}, {response.reply}')
 
                 if line[0] == 'find':
                     response = stub.FindKey(
                         pb2.RemFiKey(key=line[1])
                     )
+                    print(f'{response.success}, {response.reply}')
                 if line[0] == 'remove':
-                    response = stub.Remove(
+                    response = stub.RemoveFromClient(
                         pb2.RemFiKey(key=line[1])
                     )
+                    print(f'{response.success}, {response.reply}')
                 if line[0] == 'exit':
                     break
                 # print(response)
