@@ -59,8 +59,7 @@ if __name__ == "__main__":
                     elif server_type == "Registry":
                         ChordInfo()
                     else:
-                        print(
-                            "You aren't connected, first of all connect to chord/node")
+                        print("You aren't connected, first of all connect to chord/node")
 
                 if line[0] == 'save':
                     text = line[1].split(' ', 1)
@@ -68,32 +67,28 @@ if __name__ == "__main__":
                     msg = text[1]
                     response = stub.SaveFromClient(
                         pb2.SaveKey(key=key, text=msg))
-                    print(f'{response.success}, {response.reply}')
 
                 if line[0] == 'find':
                     response = stub.FindKey(
                         pb2.RemFiKey(key=line[1])
                     )
-                    print(f'{response.success}, {response.reply}')
                 if line[0] == 'remove':
                     response = stub.RemoveFromClient(
                         pb2.RemFiKey(key=line[1])
                     )
-                    print(f'{response.success}, {response.reply}')
                 if line[0] == 'exit':
                     break
-                # print(response)
         except KeyboardInterrupt:
             break
 
-        # except grpc.RpcError as rpc_error:
-         #   if rpc_error.code() == grpc.StatusCode.UNAVAILABLE:
-          #      print("There is no registry/node on this address, try again.")
-           # else:
-            #    print("Something wrong with grpc, try again.")
-            # pass
-        # except:
-         #   print("Something wrong, try again!")
-          #  pass
+        except grpc.RpcError as rpc_error:
+           if rpc_error.code() == grpc.StatusCode.UNAVAILABLE:
+                print("There is no registry/node on this address, try again.")
+           else:
+                print("Something wrong with grpc, try again.")
+           pass
+        except:
+           print("Something wrong, try again!")
+           pass
 
 print("Shutting down")

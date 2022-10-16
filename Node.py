@@ -27,38 +27,28 @@ def hash(key):
 
 def find(key):
     id = hash(key)
-    print("let's look")
-    print(listen_address)
-    print(predecessor)
-    print('lox')
     if (predecessor[0] < id <= nodeid):
         return True, (nodeid, listen_address)
     succ = reg_stub.GetSuccessor(pb2.NodeId(id=nodeid))
-    print(f'successors {succ.nodeId}')
     if (nodeid < id <= succ.nodeId):
         return True, (succ.nodeId, succ.address)
-    print('fsdasdjkasdj')
     keys = sorted(list(finger_table))
     for i in range(len(keys)):
         if (keys[i] >= id):
             ch = grpc.insecure_channel(finger_table[keys[i-1]])
             f_stub = pb2_grpc.SimpleServiceStub(ch)
-            print("try get reply")
             reply = f_stub.Find(pb2.RemFiKey(key=key))
-            print("got reply")
 
             if reply.success:
                 msg = reply.reply.split("||", 1)
             else:
                 msg = '0'
-            print(f'found msg! {msg}')
             return True, (msg[0], msg[1])
-    return False, "No key result"
+    return False, f"Didn't found any nodes containing {key}"
 
 
 def save(key, text):
     ack, result = find(key)
-    print(ack, result)
     if (ack):
         send_channel = grpc.insecure_channel(result[1])
         send_stub = pb2_grpc.SimpleServiceStub(send_channel)
@@ -115,7 +105,6 @@ def Update():
     global finger_table
     global predecessor
     finger_table, predecessor = get_finger_table()
-    print(finger_table)
 
 
 class Handler(pb2_grpc.SimpleServiceServicer):
@@ -145,7 +134,6 @@ class Handler(pb2_grpc.SimpleServiceServicer):
             ch = grpc.insecure_channel(reply[1])
             f_stub = pb2_grpc.SimpleServiceStub(ch)
             repl = f_stub.GetKeysText(pb2.GetInfo())
-            print(repl.keys)
             if request.key in repl.keys:
                 return pb2.SRFReply(reply=f"{request.key} is saved in {reply[0]}", success=True)
         return pb2.SRFReply(reply=f'{request.key} does not exist in node {reply[0]}', success=False)
@@ -171,7 +159,6 @@ class Handler(pb2_grpc.SimpleServiceServicer):
         return pb2.SRFReply(reply=f"{request.key} is removed from {nodeid}", success=True)
 
     def GetNode(self, request, context):
-        print(finger_table)
         msg = []
         for key in finger_table:
             msg.append(f'{key}:   {finger_table[key]}')

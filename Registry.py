@@ -20,7 +20,7 @@ def parse_address(address):
 def register(ipaddr, port):
     random.seed(0)
     if len(chord) == max_size:
-        return -1, 'Chord is full'
+        return -1, 'Chord is full.'
     while True:
         node_id = random.randrange(max_size)
         if node_id not in chord:
@@ -30,7 +30,6 @@ def register(ipaddr, port):
         if node_id != keys:
             ch = grpc.insecure_channel(chord[keys])
             f_stub = pb2_grpc.SimpleServiceStub(ch)
-            print("lox obnov")
             f_stub.ReloadTable(pb2.GetInfo())
     return node_id, m
 
@@ -80,9 +79,7 @@ def populate_finger_table(node_id):
             node = find((node_id+2**(i-1)) % max_size)
             finger_table[node] = chord[node]
         except:
-            print(f'gavno {node}')
             continue
-    print()
     return finger_table
 
 
@@ -142,4 +139,4 @@ if __name__ == "__main__":
     try:
         server.wait_for_termination()
     except KeyboardInterrupt:
-        print("Shutdowned xD")
+        print("Shutdowned registry.")
