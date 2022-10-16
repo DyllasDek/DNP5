@@ -83,12 +83,12 @@ message TableReply {
 }
 
 message FingerTable {
-  message Pair {
+  message NodePair {
     string nodeId = 1;
     string address = 2;
   }
-  repeated int32 id = 1;
-  repeated Pair pairs = 2;
+  repeated NodePair id = 1;
+  repeated NodePair pairs = 2;
 }
 //Deregister and populate
 // Node initialasition
