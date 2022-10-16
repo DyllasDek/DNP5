@@ -46,16 +46,16 @@ def get_chord_info():
 
 def findSucc(entry):
     for id in sorted(chord.keys()):
-        if entry <= id:
+        if entry < id:
             return id
+    return entry
 
 
 def findPred(entry):
-    print(entry)
-    print(reversed(sorted(chord.keys())))
     for id in reversed(sorted(chord.keys())):
-        if entry >= id:
+        if entry > id:
             return id
+    return entry
 
 
 def populate_finger_table(node_id):
