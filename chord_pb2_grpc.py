@@ -14,7 +14,7 @@ class SimpleServiceStub(object):
         Args:
             channel: A grpc.Channel.
         """
-        self.GetChord = channel.unary_stream(
+        self.GetChord = channel.unary_unary(
                 '/SimpleService/GetChord',
                 request_serializer=chord__pb2.GetInfo.SerializeToString,
                 response_deserializer=chord__pb2.GetNodeChordReply.FromString,
@@ -165,7 +165,7 @@ class SimpleServiceServicer(object):
 
 def add_SimpleServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
-            'GetChord': grpc.unary_stream_rpc_method_handler(
+            'GetChord': grpc.unary_unary_rpc_method_handler(
                     servicer.GetChord,
                     request_deserializer=chord__pb2.GetInfo.FromString,
                     response_serializer=chord__pb2.GetNodeChordReply.SerializeToString,
@@ -251,7 +251,7 @@ class SimpleService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_stream(request, target, '/SimpleService/GetChord',
+        return grpc.experimental.unary_unary(request, target, '/SimpleService/GetChord',
             chord__pb2.GetInfo.SerializeToString,
             chord__pb2.GetNodeChordReply.FromString,
             options, channel_credentials,

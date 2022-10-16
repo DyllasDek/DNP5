@@ -25,6 +25,10 @@ def register(ipaddr, port):
         node_id = random.randrange(max_size)
         if node_id not in chord:
             break
+    for keys in chord:
+        ch = grpc.insecure_channel(chord[keys])
+        f_stub = pb2_grpc.SimpleServiceStub(ch)
+        f_stub.ReloadTable(pb2.GetInfo())
     chord[node_id] = f'{ipaddr}:{port}'
     return node_id, m
 
@@ -61,8 +65,11 @@ def findPred(entry):
 def populate_finger_table(node_id):
     finger_table = {}
     for i in range(1, m+1):
-        node = findSucc((node_id+2**(i-1)) % max_size)
-        finger_table[node] = chord[node]
+        try:
+            node = findSucc((node_id+2**(i-1)) % max_size)
+            finger_table[node] = chord[node]
+        except:
+            continue
     return finger_table
 
 
@@ -100,7 +107,14 @@ class Handler(pb2_grpc.SimpleServiceServicer):
         return pb2.GetNodeChordReply(id=-1, table=msg)
 
     def DeregisterNode(self, request, context):
-        return super().DeregisterNode(request, context)
+        try:
+            deregister(request.id)
+            for keys in chord:
+                ch = grpc.insecure_channel(chord[keys])
+                f_stub = pb2_grpc.SimpleServiceStub(ch)
+                f_stub.ReloadTable(pb2.GetInfo())
+        except:
+            return pb2.DeregReply(ack=False, output="Already deleted")
 
 
 if __name__ == "__main__":

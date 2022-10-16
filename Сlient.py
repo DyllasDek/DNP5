@@ -22,18 +22,16 @@ def connect(ip):
 
 
 def NodeInfo():
+    print("lox")
     resp = stub.GetNode(pb2.GetInfo())
-    print(resp)
     print(f'Node id: {resp.id}')
     print("Finger table:")
-
     for elem in resp.table:
         print(elem)
 
 
 def ChordInfo():
     resp = stub.GetChord(pb2.GetInfo())
-    print(resp)
     for elem in resp.table:
         print(elem)
 
@@ -72,7 +70,7 @@ if __name__ == "__main__":
                         pb2.SaveKey(key=key, text=msg))
 
                 if line[0] == 'find':
-                    response = stub.Find(
+                    response = stub.FindKey(
                         pb2.RemFiKey(key=line[1])
                     )
                 if line[0] == 'remove':
@@ -81,7 +79,7 @@ if __name__ == "__main__":
                     )
                 if line[0] == 'exit':
                     break
-                print(response)
+                # print(response)
         except KeyboardInterrupt:
             break
 

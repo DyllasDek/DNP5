@@ -36,7 +36,7 @@ def find(key):
     for i in range(len(keys)):
         if (keys[i] >= id):
             ch = grpc.insecure_channel(finger_table[keys[i-1]])
-            f_stub = pb2_grpc.SimpleServiceStub(channel)
+            f_stub = pb2_grpc.SimpleServiceStub(ch)
             reply, _ = f_stub.Find(pb2.RemFiKey(key=key))
             reply = reply.split("||", 1)
             return True, (reply[0], reply[1])
@@ -76,17 +76,17 @@ def remove(key):
 
 
 def get_finger_table():
-    print("norm1")
     result = reg_stub.GetFingerTable(pb2.NodeId(id=nodeid))
-    print("norm2")
+
     message_table = result.pairs
-    print("norm3")
+
     output_table = {}
     for message in message_table:
         output_table[message.nodeId] = message.address
-    print("norm")
-    output_table = sorted(output_table.keys())
-    print(output_table)
+    try:
+        del output_table[nodeid]
+    except:
+        pass
     predecessor_message = result.id
     predecessor = predecessor_message.nodeId, predecessor_message.address
     return output_table, predecessor
@@ -98,7 +98,8 @@ def start():
 
 
 def exit():
-    reg_stub.DeregisterNode(pb2.NodeId(nodeid))
+    reply = reg_stub.DeregisterNode(pb2.NodeId(nodeid))
+    return reply.ack, reply.output
 
 
 def GetKeys():
@@ -106,6 +107,11 @@ def GetKeys():
 
 
 class Handler(pb2_grpc.SimpleServiceServicer):
+
+    def ReloadTable(self, request, context):
+        finger_table, predecessor = get_finger_table()
+        return pb2.GetInfo()
+
     def GetType(self, request, context):
         return pb2.TypeReply(type="Node")
 
@@ -168,4 +174,9 @@ if __name__ == "__main__":
     try:
         server.wait_for_termination()
     except KeyboardInterrupt:
-        print("Shutdowned")
+        flag, msg = exit()
+        if flag:
+            print(f'Succesfully deregistred node with id {nodeid}')
+        else:
+            print(f"Unsuccesful deregister with error:{msg}")
+    print("Shutdowned")
