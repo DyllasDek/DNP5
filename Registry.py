@@ -51,6 +51,8 @@ def findSucc(entry):
 
 
 def findPred(entry):
+    print(entry)
+    print(reversed(sorted(chord.keys())))
     for id in reversed(sorted(chord.keys())):
         if entry >= id:
             return id
@@ -75,11 +77,22 @@ class Handler(pb2_grpc.SimpleServiceServicer):
     def GetFingerTable(self, request, context):
         table = populate_finger_table(request.id)
         out_pred = findPred(request.id)
-        out_table = []
+        print(out_pred)
+        print("lox")
+        print(type(out_pred))
+        msg = pb2.FingerTable()
+        msg.id.nodeId = out_pred
+        msg.id.address = chord[out_pred]
+
         for key in table:
-            out_table.append(pb2.NodePair(nodeId=key, address=table[key]))
-        print(out_table)
-        return pb2.FingerTable(id=pb2.NodePair(nodeId=out_pred, address=chord[out_pred]), pairs=out_table)
+            print(type(key))
+            pair = msg.pairs.add()
+            pair.nodeId = key
+            pair.address = table[key]
+
+        print(msg)
+        return msg
+        # return pb2.FingerTable(id=pb2.NodePair(nodeId=out_pred, address=chord[out_pred]), pairs[:]=out_table)
 
     def GetSplitResponse(self, request, context):
 
