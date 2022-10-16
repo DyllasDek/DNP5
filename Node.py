@@ -12,7 +12,7 @@ channel = grpc.insecure_channel(server_address)
 reg_stub = pb2_grpc.SimpleServiceStub(channel)
 ip, port = listen_address.split(":")
 
-#Default node data
+# Default node data
 nodeid = -1
 m = -1
 predecessor = None
@@ -20,7 +20,7 @@ data = {}
 finger_table = {}
 
 
-#Convertation from key to hash id 
+# Convertation from key to hash id
 def hash(key):
     hash_value = zlib.adler32(key.encode())
     target_id = hash_value % 2 ** m
@@ -29,13 +29,14 @@ def hash(key):
 
 def find(key):
     id = hash(key)
-    if (predecessor[0] < id <= nodeid): #if id is between predecessor and our node
+    if (predecessor[0] < id <= nodeid):  # if id is between predecessor and our node
         return True, (nodeid, listen_address)
     succ = reg_stub.GetSuccessor(pb2.NodeId(id=nodeid))
-    if (nodeid < id <= succ.nodeId): #if id is between successor and our node
+    if (nodeid < id <= succ.nodeId):  # if id is between successor and our node
         return True, (succ.nodeId, succ.address)
     keys = sorted(list(finger_table))
-    for i in range(len(keys)): #else we check finger table, find node there and try to find value there
+    # else we check finger table, find node there and try to find value there
+    for i in range(len(keys)):
         if (keys[i] >= id):
             ch = grpc.insecure_channel(finger_table[keys[i-1]])
             f_stub = pb2_grpc.SimpleServiceStub(ch)
@@ -173,8 +174,12 @@ class Handler(pb2_grpc.SimpleServiceServicer):
         return pb2.KeysTextReply(keys=msg)
 
 
-nodeid, m = start()
-finger_table, predecessor = get_finger_table()
+try:
+    nodeid, m = start()
+    finger_table, predecessor = get_finger_table()
+except:
+    print("Can't connect to regetry")
+    sys.exit()
 server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
 pb2_grpc.add_SimpleServiceServicer_to_server(Handler(), server)
 server.add_insecure_port(listen_address)
