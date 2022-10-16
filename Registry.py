@@ -1,5 +1,4 @@
 import sys
-from Node import get_successor_id
 import grpc
 import random
 import chord_pb2_grpc as pb2_grpc
@@ -47,14 +46,16 @@ def get_chord_info():
 
 def findSucc(entry):
     for id in sorted(chord.keys()):
-        if entry <= id:
+        if entry < id:
             return id
+    return entry
 
 
 def findPred(entry):
     for id in reversed(sorted(chord.keys())):
-        if entry >= id:
+        if entry > id:
             return id
+    return entry
 
 
 def populate_finger_table(node_id):
@@ -66,6 +67,9 @@ def populate_finger_table(node_id):
 
 
 class Handler(pb2_grpc.SimpleServiceServicer):
+    def GetType(self, request, context):
+        return pb2.TypeReply(type="Connected to Registry")
+
     def RegisterNode(self, request, context):
         output = register(request.ipaddr, request.port)
         return pb2.NodeReply(id=output[0], m=output[1])
@@ -87,26 +91,11 @@ class Handler(pb2_grpc.SimpleServiceServicer):
             pair.address = table[key]
 
         return msg
+
     def GetSuccessor(self, request, context):
-        succ_id= get_successor_id(request.id)
-        succ_address=chord[succ_id]
-        return pb2.NodePair(nodeId=succ_id,address=succ_address) 
-    def GetSplitResponse(self, request, context):
-
-        m_string = request.input.split(request.delim)
-        num = len(m_string)
-        response = {
-            "number": num,
-            "parts": m_string
-        }
-        return pb2.SplitResponse(**response)
-
-    def GetPrimeResponse(self, request_iterator, context):
-        for request in request_iterator:
-            if is_prime(request.num):
-                yield pb2.PrimeResponse(output='%s is prime ' % request.num)
-            else:
-                yield pb2.PrimeResponse(output='%s is not prime ' % request.num)
+        succ_id = findSucc(request.id)
+        succ_address = chord[succ_id]
+        return pb2.NodePair(nodeId=succ_id, address=succ_address)
 
     def DeregisterNode(self, request, context):
         return super().DeregisterNode(request, context)
