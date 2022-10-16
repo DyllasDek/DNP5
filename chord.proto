@@ -84,7 +84,7 @@ message TableReply {
 
 message FingerTable {
   message NodePair {
-    string nodeId = 1;
+    int32 nodeId = 1;
     string address = 2;
   }
   repeated NodePair id = 1;

@@ -14,7 +14,7 @@ stub = pb2_grpc.SimpleServiceStub(channel)
 ip,address=server_address.split(":")
 nodeid=-1
 max_size= -1
-finger_table={}
+predessor = None
 
 def hash(key):
     hash_value = zlib.adler32(key.encode())
@@ -31,18 +31,24 @@ def save(key, text):
         return (False, result)
     
 def get_finger_table():
-    return finger_table
+    result= stub.GetFingerTable(pb2.NodeId(id=nodeid))
+    finger_table= result["pairs"]
+    predessor= result["id"]
 
+def get_successor_id():
+    return None
+
+
+def request_successor_data():
 
 def find(key):
     id = hash(key)
 
 
 
-
 def start():
     register_output= stub.RegisterNode(pb2.NodeInit(ipaddr= ip,port=address))
-    nodeid, max_size=register_output["id"]
+    nodeid, max_size=register_output["id"], register_output["m"]
 
 def exit():
     stub.DeregisterNode(pb2.NodeId(nodeid))
