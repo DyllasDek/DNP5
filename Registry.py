@@ -68,7 +68,7 @@ def populate_finger_table(node_id):
 
 class Handler(pb2_grpc.SimpleServiceServicer):
     def GetType(self, request, context):
-        return pb2.TypeReply(type="Connected to Registry")
+        return pb2.TypeReply(type="Registry")
 
     def RegisterNode(self, request, context):
         output = register(request.ipaddr, request.port)
@@ -79,23 +79,25 @@ class Handler(pb2_grpc.SimpleServiceServicer):
 
     def GetFingerTable(self, request, context):
         table = populate_finger_table(request.id)
+        print(table)
         out_pred = findPred(request.id)
-        msg = pb2.FingerTable()
-        msg.id.nodeId = out_pred
-        msg.id.address = chord[out_pred]
+        msg = []
+        for keys in table:
+            msg.append(pb2.NodePair(nodeId=keys, address=chord[keys]))
 
-        for key in table:
-            print(type(key))
-            pair = msg.pairs.add()
-            pair.nodeId = key
-            pair.address = table[key]
-
-        return msg
+        return pb2.FingerTable(id=pb2.NodePair(nodeId=out_pred, address=chord[out_pred]), pairs=msg)
 
     def GetSuccessor(self, request, context):
         succ_id = findSucc(request.id)
         succ_address = chord[succ_id]
         return pb2.NodePair(nodeId=succ_id, address=succ_address)
+
+    def GetChord(self, request, context):
+        msg = []
+        for key in chord:
+            msg.append(f'{key}:   {chord[key]}')
+        print(msg)
+        return pb2.GetNodeChordReply(id=-1, table=msg)
 
     def DeregisterNode(self, request, context):
         return super().DeregisterNode(request, context)

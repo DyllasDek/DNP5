@@ -3,13 +3,8 @@ import grpc
 import chord_pb2_grpc as pb2_grpc
 import chord_pb2 as pb2
 
-
 channel = 0
 stub = 0
-server_type = 0
-
-channel = grpc.insecure_channel("1.1.1.1.1.1.")
-stub = pb2_grpc.SimpleServiceStub(channel)
 
 
 def send_messages(val):
@@ -23,24 +18,30 @@ def connect(ip):
     channel = grpc.insecure_channel(ip)
     stub = pb2_grpc.SimpleServiceStub(channel)
     server_type = stub.GetType(pb2.GetInfo())
-    return 'Connected to' + server_type
+    return stub, server_type.type
 
 
 def NodeInfo():
     resp = stub.GetNode(pb2.GetInfo())
-    print(f'Node id: {resp[0]}')
+    print(resp)
+    print(f'Node id: {resp.id}')
     print("Finger table:")
-    for elem in resp[1:]:
+
+    for elem in resp.table:
         print(elem)
 
 
 def ChordInfo():
     resp = stub.GetChord(pb2.GetInfo())
-    for elem in resp:
+    print(resp)
+    for elem in resp.table:
         print(elem)
 
 
 if __name__ == "__main__":
+    server_type = 0
+
+    stub = None
     while True:
         response = 0
         try:
@@ -48,11 +49,14 @@ if __name__ == "__main__":
             if len(line) != 0:
                 line = line.split(' ', 1)
 
-                if line[0] == 'connect':
-                    print(connect(line[1]))
+                if line[0] == "connect":
+                    stub, server_type = connect(line[1])
+                    print()
+                    print(f'Connected to {server_type}')
+                    continue
 
-                if line[0] == 'get_info':
-                    if server_type == 'Node':
+                if line[0] == "get_info":
+                    if server_type == "Node":
                         NodeInfo()
                     elif server_type == "Registry":
                         ChordInfo()
@@ -81,14 +85,14 @@ if __name__ == "__main__":
         except KeyboardInterrupt:
             break
 
-        except grpc.RpcError as rpc_error:
-            if rpc_error.code() == grpc.StatusCode.UNAVAILABLE:
-                print("There is no registry/node on this address, try again.")
-            else:
-                print("Something wrong with grpc, try again.")
-            pass
-        except:
-            print("Something wrong, try again!")
-            pass
+        # except grpc.RpcError as rpc_error:
+         #   if rpc_error.code() == grpc.StatusCode.UNAVAILABLE:
+          #      print("There is no registry/node on this address, try again.")
+           # else:
+            #    print("Something wrong with grpc, try again.")
+            # pass
+        # except:
+         #   print("Something wrong, try again!")
+          #  pass
 
 print("Shutting down")

@@ -2,6 +2,7 @@ import sys
 import grpc
 import chord_pb2_grpc as pb2_grpc
 import chord_pb2 as pb2
+from concurrent import futures
 import zlib
 
 args = sys.argv
@@ -15,7 +16,7 @@ nodeid = -1
 max_size = -1
 predecessor = None
 data = {}
-finger_table = None
+finger_table = {}
 
 
 def hash(key):
@@ -75,15 +76,20 @@ def remove(key):
 
 
 def get_finger_table():
+    print("norm1")
     result = reg_stub.GetFingerTable(pb2.NodeId(id=nodeid))
+    print("norm2")
     message_table = result.pairs
-    finger_table = {}
+    print("norm3")
+    output_table = {}
     for message in message_table:
-        finger_table[message.nodeId] = message.address
-    finger_table = sorted(finger_table.keys())
+        output_table[message.nodeId] = message.address
+    print("norm")
+    output_table = sorted(output_table.keys())
+    print(output_table)
     predecessor_message = result.id
     predecessor = predecessor_message.nodeId, predecessor_message.address
-    return finger_table, predecessor
+    return output_table, predecessor
 
 
 def start():
@@ -101,7 +107,7 @@ def GetKeys():
 
 class Handler(pb2_grpc.SimpleServiceServicer):
     def GetType(self, request, context):
-        return pb2.TypeReply(type="Connected to Node")
+        return pb2.TypeReply(type="Node")
 
     def Find(self, request, context):
         flag, reply = find(request.key)
@@ -137,13 +143,29 @@ class Handler(pb2_grpc.SimpleServiceServicer):
         del data[request.key]
         return pb2.SRFReply(reply=f"{request.key} is removed from {nodeid}", success=True)
 
+    def GetNode(self, request, context):
+        print(finger_table)
+        msg = []
+        for key in finger_table:
+            msg.append(f'{key}:   {finger_table[key]}')
+        return pb2.GetNodeChordReply(id=nodeid, table=msg)
+
     def GetKeysText(self, request, context):
-        msg = pb2.GetKeysText()
+        msg = []
         k = GetKeys()
         for key in k:
-            msg.keys.append(key)
-        return msg
+            msg.append(key)
+        return pb2.KeysTextReply(keys=msg)
 
 
 if __name__ == "__main__":
     nodeid, max_size = start()
+    finger_table, predecessor = get_finger_table()
+    server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
+    pb2_grpc.add_SimpleServiceServicer_to_server(Handler(), server)
+    server.add_insecure_port(listen_address)
+    server.start()
+    try:
+        server.wait_for_termination()
+    except KeyboardInterrupt:
+        print("Shutdowned")
