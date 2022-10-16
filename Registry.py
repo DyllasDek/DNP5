@@ -78,6 +78,7 @@ class Handler(pb2_grpc.SimpleServiceServicer):
         out_table = []
         for key in table:
             out_table.append(pb2.NodePair(nodeId=key, address=table[key]))
+        print(out_table)
         return pb2.FingerTable(id=pb2.NodePair(nodeId=out_pred, address=chord[out_pred]), pairs=out_table)
 
     def GetSplitResponse(self, request, context):
