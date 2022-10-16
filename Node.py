@@ -7,14 +7,15 @@ import zlib
 args= sys.argv
 server_address, listen_address= args[1], args[2]
 
-data = None
-
 channel = grpc.insecure_channel(server_address)
 stub = pb2_grpc.SimpleServiceStub(channel)
 ip,address=server_address.split(":")
+
 nodeid=-1
 max_size= -1
 predessor = None
+data = {}
+finger_table= None
 
 def hash(key):
     hash_value = zlib.adler32(key.encode())
@@ -34,6 +35,7 @@ def get_finger_table():
     result= stub.GetFingerTable(pb2.NodeId(id=nodeid))
     finger_table= result["pairs"]
     predessor= result["id"]
+    print(finger_table)
 
 def get_successor_id():
     return None
@@ -43,6 +45,7 @@ def request_successor_data():
 
 def find(key):
     id = hash(key)
+    finger_table.sort()
 
 
 
@@ -57,3 +60,4 @@ def exit():
 
 if __name__ == "__main__":    
     start()
+    get_finger_table()
