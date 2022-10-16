@@ -8,12 +8,15 @@ from concurrent import futures
 server_address, m = sys.argv[1], int(sys.argv[2])
 max_size = 2 ** m
 chord = {}
+
+
 def parse_address(address):
-    split_res=address.split(":")
-    if len(split_res) == 1: #we pass value only of the port
+    split_res = address.split(":")
+    if len(split_res) == 1:  # we pass value only of the port
         return f"localhost:{address}"
     return address
-        
+
+
 def register(ipaddr, port):
     random.seed(0)
     if len(chord) == max_size:
@@ -41,25 +44,41 @@ def get_chord_info():
     return output
 
 
-def populate_finger_table(node_id):
-    finger_table = []
+def findSucc(entry):
+    for id in sorted(chord.keys()):
+        if entry <= id:
+            return id
 
-    def find(entry):
-        for id in sorted(chord.keys()):
-            if entry <= id:
-                return id
+
+def findPred(entry):
+    for id in reversed(sorted(chord.keys())):
+        if entry >= id:
+            return id
+
+
+def populate_finger_table(node_id):
+    finger_table = {}
     for i in range(1, m+1):
-        node = find((node_id+2**(i-1)) % max_size)
-        finger_table.append(chord[node])
+        node = findSucc((node_id+2**(i-1)) % max_size)
+        finger_table[node] = chord[node]
     return finger_table
 
 
 class Handler(pb2_grpc.SimpleServiceServicer):
     def RegisterNode(self, request, context):
-        output=register(request.ipaddr, request.port)
-        return pb2.NodeReply(id=output[0],m=output[1])
+        output = register(request.ipaddr, request.port)
+        return pb2.NodeReply(id=output[0], m=output[1])
+
     def GetReverseResponse(self, request, context):
         return pb2.ReverseResponse(message='%s' % request.input[::-1])
+
+    def GetFingerTable(self, request, context):
+        table = populate_finger_table(request.id)
+        out_pred = findPred(request.id)
+        out_table = []
+        for key in table:
+            out_table.append(pb2.NodePair(nodeId=key, address=table[key]))
+        return pb2.FingerTable(id=pb2.NodePair(nodeId=out_pred, address=chord[out_pred]), pairs=out_table)
 
     def GetSplitResponse(self, request, context):
 
@@ -81,7 +100,7 @@ class Handler(pb2_grpc.SimpleServiceServicer):
     def DeregisterNode(self, request, context):
         return super().DeregisterNode(request, context)
 
-        
+
 if __name__ == "__main__":
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     pb2_grpc.add_SimpleServiceServicer_to_server(Handler(), server)
